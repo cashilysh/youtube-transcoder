@@ -26,7 +26,7 @@ The manifest also stores a SHA-256 checksum of the original file (along with oth
 
 ## Requirements
 
-- Python 3.12 (tested on Arch Linux and Windows)
+- Python (tested with 3.12)
 - `ffmpeg` on PATH or in the script folder
 - `yt-dlp` on PATH or in the script folder *(decode from URL only)*
 - Python packages: `numpy`, `zfec`
@@ -35,7 +35,7 @@ The manifest also stores a SHA-256 checksum of the original file (along with oth
 pip install numpy zfec yt-dlp
 ```
 
-The script will locate `ffmpeg` and `yt-dlp` automatically — checking PATH first, then falling back to the directory containing the script. It validates each binary before use, so a broken PyInstaller bundle on PATH won't silently cause failures.
+Tested on CachyOS (Arch) and Windows 10.
 
 ---
 
