@@ -1,6 +1,6 @@
 # YoutubeTranscoder
 
-Encode any file into an 8K black-and-white data video, upload it to YouTube, and decode it back — byte-for-byte identical to the original.
+Encode any file into an 8K black-and-white data video, upload it to YouTube, and decode it back — byte-for-byte identical to the original. Created with Claude AI.
 
 > **Legal notice:** This tool is for personal archival and legitimate data storage only. Do not use it to distribute copyrighted material or anything illegal. Any file you share via YouTube video should be an **encrypted archive** (e.g. a password-protected `.7z` or `.zip`) — YouTube videos are public by default, and unencrypted files expose your data to anyone who downloads them.
 
@@ -16,11 +16,11 @@ Each frame is a 7680×4320 (8K) image made up of 4×4 pixel blocks. Every block 
 
 The file is split into segments. Each segment is encoded into **M=15 shares** (frames), of which only **K=12 are needed** to reconstruct it — meaning up to 3 corrupted or missing frames per segment are tolerated.
 
-YouTube applies two lossy passes (your HEVC upload → VP9 re-encode for some clients), and the erasure coding absorbs that damage.
-
 ### Integrity: double SHA-256 guard
 
 Each frame also carries a double SHA-256 guard. If either copy mismatches, the frame is silently erased and zfec reconstructs the segment from the remaining clean shares instead.
+
+The manifest also stores a SHA-256 checksum of the original file (along with other metadata), enabling a 3-way verification (`source == manifest == decoded`) during the round-trip self-test.
 
 ---
 
