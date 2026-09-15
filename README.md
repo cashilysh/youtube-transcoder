@@ -4,11 +4,6 @@ Encode any file into an 8K black-and-white data video, upload it to YouTube, and
 
 > **Legal notice:** This tool is for personal archival and legitimate data storage only. Do not use it to distribute copyrighted material or anything illegal. Any file you share via YouTube video should be an **encrypted archive** (e.g. a password-protected `.7z` or `.zip`) — YouTube videos are public by default, and unencrypted files expose your data to anyone who downloads them.
 
----
-
-<!-- screenshot: encoding in progress -->
-
----
 
 ## How it works
 
@@ -18,15 +13,6 @@ Each frame is a 7680×4320 (8K) image made up of 4×4 pixel blocks. Every block 
 
 The file is split into segments. Each segment is encoded into **M=15 shares** (frames), of which only **K=12 are needed** to reconstruct it — meaning up to 3 corrupted or missing frames per segment are tolerated. YouTube applies two lossy passes (your HEVC upload → VP9 re-encode for some clients), and the erasure coding absorbs that damage. Each frame also carries a double SHA-256 guard: if either copy mismatches, the frame is silently erased and zfec reconstructs the segment from the remaining clean shares instead.
 
-**Encoders**
-
-| | CPU (x265) | GPU (hevc_nvenc) |
-|---|---|---|
-| Flag | *(default)* | `--nvenc` |
-| Quality | CRF 20, `superfast` preset | QP 4, p4 preset |
-| Notes | Slower, no GPU required | Fast, requires NVIDIA GPU |
-
----
 
 ## Requirements
 
@@ -64,11 +50,6 @@ python YoutubeTranscoder.py -d https://www.youtube.com/watch?v=XXXXXXXXXXX
 ```
 No temporary file is written. yt-dlp pipes the video stream directly into ffmpeg, which feeds frames to the decoder. The 8K stream must be available — YouTube can take minutes to hours to process 8K after upload.
 
----
-
-<!-- screenshot: streaming decode in progress -->
-
----
 
 **Round-trip self-test**
 ```
@@ -79,28 +60,3 @@ Encodes, then immediately decodes, then verifies the decoded file is byte-identi
 
 ---
 
-## Security advice
-
-Always encrypt your files before encoding. A password-protected archive means even if someone downloads your YouTube video and decodes it, they cannot read the contents without your key.
-
-```
-# Example: encrypt with 7-Zip before encoding
-7z a -p -mhe=on archive.7z myfile.pdf
-python YoutubeTranscoder.py -e archive.7z --nvenc
-```
-
----
-
-## Configuration
-
-Edit the constants near the bottom of `YoutubeTranscoder.py`:
-
-| Setting | Default | Description |
-|---|---|---|
-| `ZFEC_K` | 12 | Shares needed to reconstruct a segment |
-| `ZFEC_M` | 15 | Total shares per segment (frames per segment) |
-| `CPU_CRF` | 20 | x265 quality (lower = larger file) |
-| `CPU_PRESET` | `superfast` | x265 speed preset |
-| `NVENC_QP` | 4 | hevc_nvenc quality (lower = larger file, safe range 0–14) |
-| `NVENC_PRESET` | `p4` | hevc_nvenc speed preset (p1–p7) |
-| `ENCODE_FPS` | 30 | Output frame rate (does not affect data capacity) |
